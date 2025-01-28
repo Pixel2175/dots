@@ -1,0 +1,22 @@
+ctrl + shift + n + f
+  xdotool super+n
+
+ctrl + shift + Up
+  doas light -A 10
+ctrl + shift + Down
+  doas light -U 10
+
+ctrl + shift + Right
+  pactl set-sink-volume @DEFAULT_SINK@ +10%
+
+ctrl + shift + Left
+  pactl set-sink-volume @DEFAULT_SINK@ -10%
+
+
+ctrl + shift + w
+  tcc -run /home/$USER/.change_wall.c
+
+ctrl + shift + m
+  maim -s -o | xclip -selection clipboard -t image/png && pino --title "Screenshot" --message "The screenshot has been copied to clipboard"
+
+
