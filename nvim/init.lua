@@ -21,6 +21,12 @@ if not vim.loop.fs_stat(lazypath) then
   })
   print("Lazy.nvim installed successfully!")
 end
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "html,css,javascript,rust,python,lua,go,*",
+    command = "setlocal tabstop=4 shiftwidth=4 expandtab"
+})
+
+
 vim.opt.rtp:prepend(lazypath)
 
 -- Configure lazy.nvim to load plugins
