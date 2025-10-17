@@ -1,1 +1,0 @@
-(xinput float 12 && xinput float 14 && xinput float 11 && xinput float 19 &&  xdotool key super+n && sleep 0.1 && xinput reattach 12 3 && xinput reattach 14 3 && xinput reattach 11 3 && xinput reattach 19 3)

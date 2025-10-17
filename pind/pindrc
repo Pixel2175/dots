@@ -1,0 +1,28 @@
+# Brightness controls
+ctrl + shift + k                          =>   doas light -A 10 && sta -id 5 -name $(light -G | awk '{print "  "" " int($1) "% │"}')
+ctrl + shift + j                          =>   doas light -U 10 && sta -id 5 -name $(light -G | awk '{print "  "" " int($1) "% │"}')
+
+# Run pind with doas
+ctrl + shift + r                  =>   pindc doas 
+
+# Volume controls
+ctrl + shift + l                          =>   pactl set-sink-volume @DEFAULT_SINK@ +10% && sta -id 6 -name "   $(pamixer --get-volume)% │"
+ctrl + shift + h                          =>   pactl set-sink-volume @DEFAULT_SINK@ -10% && sta -id 6 -name "   $(pamixer --get-volume)% │"
+
+# Screenshot
+ctrl + shift + m                  =>  grim -g "$(slurp)" - | wl-copy -t image/png
+
+# Scripts 
+ctrl + shift + c                  => ~/docs/scripts/files.sh
+
+# Books
+meta + s                          => set selected (ls ~/docs/books/*.pdf | xargs -n1 basename | wmenu); and test -n "$selected"; and zathura ~/docs/books/"$selected" &disown
+
+# Play video 
+meta + shift + m                          => mpv $(wl-paste) --loop
+
+meta + shift + p 					=> mpv ~/music/ 
+
+
+# meta + shift + return           => st 
+# meta + shift + return           => footclient
