@@ -55,13 +55,13 @@ check `colorscheme` file
 
 # Preview
 <table>
-  <h3 style="text-align: center;">DWL</h3>
   <tr>
+  <h3 style="text-align: center;">DWL</h3>
     <td><img src="./screenshots/dwl-00.png" width="100%"></td>
     <td><img src="./screenshots/dwl-01.png" width="100%"></td>
   </tr>
-  <h3 style="text-align: center;">Neovim</h3>
   <tr>
+  <h3 style="text-align: center;">Neovim</h3>
     <td><img src="./screenshots/nvim-00.png" width="100%"></td>
     <td><img src="./screenshots/nvim-01.png" width="100%"></td>
   </tr>
