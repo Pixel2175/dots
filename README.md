@@ -26,6 +26,13 @@ Everything is processed by simple for loops calling Neovim APIs.
 
 Plugins setup and LSP are separated modules that run after core config is loaded.
 
+I use two main functions (there may be more in the future):
+
+> gdb function:
+A simple but powerful function that opens GDB inside Neovim.
+> fzy function:
+Another simple but powerful function that opens an FZY window for searching files.
+
 > **Plugins**:
 - [Comment.nvim](https://github.com/numToStr/Comment.nvim)
 - [cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp)
