@@ -54,16 +54,19 @@ It is used across the window manager, terminal, neovim, and even Krita to keep a
 check `colorscheme` file 
 
 # Preview
+
+<h3 style="text-align: center;">DWL</h3>
 <table>
   <tr>
-  <h3 style="text-align: center;">DWL</h3>
     <td><img src="./screenshots/dwl-00.png" width="100%"></td>
     <td><img src="./screenshots/dwl-01.png" width="100%"></td>
   </tr>
+</table>
+
+<h3 style="text-align: center;">Neovim</h3>
+<table>
   <tr>
-  <h3 style="text-align: center;">Neovim</h3>
     <td><img src="./screenshots/nvim-00.png" width="100%"></td>
     <td><img src="./screenshots/nvim-01.png" width="100%"></td>
   </tr>
 </table>
-
