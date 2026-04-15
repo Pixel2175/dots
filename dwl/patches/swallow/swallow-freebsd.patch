@@ -1,0 +1,54 @@
+From 301e1b368d92a32a7bdcd4bd1f0ede0295977e3e Mon Sep 17 00:00:00 2001
+From: Nikita Ivanov <nikita.vyach.ivanov@gmail.com>
+Date: Mon, 3 Mar 2025 19:49:07 +0100
+Subject: [PATCH] swallow: add FreeBSD support
+
+---
+ dwl.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/dwl.c b/dwl.c
+index 71d500a..52fdd9c 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -67,6 +67,14 @@
+ #include <xcb/xcb_icccm.h>
+ #endif
+ 
++#ifdef __FreeBSD__
++#define __BSD_VISIBLE
++#include <sys/types.h>
++#include <sys/param.h>
++#include <sys/sysctl.h>
++#include <sys/user.h>
++#endif
++
+ #include "util.h"
+ 
+ /* macros */
+@@ -2032,6 +2040,7 @@ outputmgrtest(struct wl_listener *listener, void *data)
+ pid_t
+ parentpid(pid_t pid)
+ {
++#ifdef __linux__
+ 	unsigned int v = 0;
+ 	FILE *f;
+ 	char buf[256];
+@@ -2041,6 +2050,14 @@ parentpid(pid_t pid)
+ 	fscanf(f, "%*u %*s %*c %u", &v);
+ 	fclose(f);
+ 	return (pid_t)v;
++#elif defined(__FreeBSD__)
++	struct kinfo_proc kip;
++	size_t len = sizeof(struct kinfo_proc);
++	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, p };
++	if (sysctl(mib, 4, &kip, &len, NULL, 0) < 0 || len == 0)
++		return 0;
++	return kip.ki_ppid;
++#endif
+ }
+ 
+ void
+-- 
+2.49.0
+

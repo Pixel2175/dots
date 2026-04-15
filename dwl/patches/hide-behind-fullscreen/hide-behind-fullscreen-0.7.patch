@@ -1,0 +1,73 @@
+From 78e5c4b42cf125be70814fd65a09cbcf0a18aa7e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Leonardo=20Hern=C3=A1ndez=20Hern=C3=A1ndez?=
+ <leohdz172@proton.me>
+Date: Sun, 10 Apr 2022 22:38:53 -0500
+Subject: [PATCH] hide-behind-fullscreen
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Leonardo Hernández Hernández <leohdz172@proton.me>
+---
+ config.def.h |  2 +-
+ dwl.c        | 24 +++++++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 22d2171d..1d5a4c84 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -12,7 +12,7 @@ static const float bordercolor[]           = COLOR(0x444444ff);
+ static const float focuscolor[]            = COLOR(0x005577ff);
+ static const float urgentcolor[]           = COLOR(0xff0000ff);
+ /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
+-static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* You can also use glsl colors */
++static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 0.0f}; /* You can also use glsl colors */
+ 
+ /* tagging - TAGCOUNT must be no greater than 31 */
+ #define TAGCOUNT (9)
+diff --git a/dwl.c b/dwl.c
+index a2711f67..56356f29 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -484,7 +484,9 @@ applyrules(Client *c)
+ void
+ arrange(Monitor *m)
+ {
+-	Client *c;
++	LayerSurface *l;
++	Client *c, *sel = focustop(m);
++	int i;
+ 
+ 	if (!m->wlr_output->enabled)
+ 		return;
+@@ -515,6 +517,26 @@ arrange(Monitor *m)
+ 								: c->scene->node.parent);
+ 	}
+ 
++	if (sel && sel->isfullscreen && VISIBLEON(sel, m)) {
++		for (i = 2; i > ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND; i--) {
++			wl_list_for_each(l, &sel->mon->layers[i], link)
++				wlr_scene_node_set_enabled(&l->scene->node, 0);
++		}
++
++		wl_list_for_each(c, &clients, link) {
++			if (c->mon != m)
++				continue;
++			wlr_scene_node_set_enabled(&c->scene->node, (sel->isfullscreen && c == sel)
++					|| !sel->isfullscreen);
++		}
++	}
++	if (!sel || (!sel->isfullscreen && VISIBLEON(sel, m))) {
++		for (i = 2; i > ZWLR_LAYER_SHELL_V1_LAYER_BACKGROUND; i--) {
++			wl_list_for_each(l, &m->layers[i], link)
++				wlr_scene_node_set_enabled(&l->scene->node, 1);
++		}
++	}
++
+ 	if (m->lt[m->sellt]->arrange)
+ 		m->lt[m->sellt]->arrange(m);
+ 	motionnotify(0, NULL, 0, 0, 0, 0);
+-- 
+2.46.0
+

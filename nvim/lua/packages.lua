@@ -1,0 +1,15 @@
+return {
+    "https://github.com/hrsh7th/cmp-nvim-lsp",
+    "https://github.com/hrsh7th/cmp-path",
+    "https://github.com/numToStr/Comment.nvim",
+    "https://github.com/vyfor/cord.nvim",
+    "https://github.com/lewis6991/gitsigns.nvim",
+    "https://github.com/Skardyy/neo-img",
+    "https://github.com/hrsh7th/nvim-cmp",
+	"https://github.com/Pixel2175/nvim-colorizer.lua",
+    "https://github.com/neovim/nvim-lspconfig",
+    "https://github.com/nvim-treesitter/nvim-treesitter",
+    "https://github.com/akinsho/toggleterm.nvim",
+    "https://github.com/alvan/vim-closetag",
+    "https://github.com/vimpostor/vim-tpipeline",
+}

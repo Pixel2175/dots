@@ -1,0 +1,38 @@
+From 5dc83d75ff1b7dadf1fd1f96fe2303848e35d382 Mon Sep 17 00:00:00 2001
+From: pi66 <pixel2176@proton.me>
+Date: Sat, 28 Feb 2026 20:26:28 +0100
+Subject: [PATCH] add window_title option (like dwm notitle patch)
+
+---
+ config.def.h | 1 +
+ dwl.c        | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config.def.h b/config.def.h
+index 7da50d2..3d3dfe8 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -7,6 +7,7 @@
+ static const int sloppyfocus               = 1;  /* focus follows mouse */
+ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
+ static const unsigned int borderpx         = 1;  /* border pixel of windows */
++static const int window_title              = 0;  /* 1 means showing window titles on the bar */
+ static const int showbar                   = 1; /* 0 means no bar */
+ static const int topbar                    = 1; /* 0 means bottom bar */
+ static const char *fonts[]                 = {"monospace:size=10"};
+diff --git a/dwl.c b/dwl.c
+index 7fe9468..0c7262a 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -1614,7 +1614,7 @@ drawbar(Monitor *m)
+ 	x = drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, m->ltsymbol, 0);
+ 
+ 	if ((w = m->b.width - tw - x) > m->b.height) {
+-		if (c) {
++		if (c && window_title) {
+ 			drwl_setscheme(m->drw, colors[m == selmon ? SchemeSel : SchemeNorm]);
+ 			drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, client_get_title(c), 0);
+ 			if (c && c->isfloating)
+-- 
+2.52.0
+

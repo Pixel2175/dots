@@ -1,0 +1,80 @@
+From 89029325be300f03bbc3ca3b2d77f107d0cb5ca2 Mon Sep 17 00:00:00 2001
+From: pi66 <pixel2176@proton.me>
+Date: Tue, 25 Nov 2025 12:53:36 +0100
+Subject: [PATCH] Add: load colors from an external file
+
+---
+ config.def.h |  3 +++
+ dwl.c        | 21 +++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/config.def.h b/config.def.h
+index 1b7472d..3c04759 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -9,6 +9,8 @@ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will
+ static const unsigned int borderpx         = 1;  /* border pixel of windows */
+ static const int showbar                   = 1; /* 0 means no bar */
+ static const int topbar                    = 1; /* 0 means bottom bar */
++static const int refresh_colors            = 0; /* 1 means reloading colors when the session starts*/
++static const char *colors_file             = "/home/pixel/.cache/wal/dwl-colors"; /* change the username */
+ static const char *fonts[]                 = {"monospace:size=10"};
+ static const float rootcolor[]             = COLOR(0x000000ff);
+ /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
+@@ -135,6 +137,7 @@ static const Key keys[] = {
+ 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,     spawn,          {.v = termcmd} },
+ 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
+ 	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },
++	{ MODKEY,                    XKB_KEY_n,          reload_colors,  {0} },
+ 	{ MODKEY,                    XKB_KEY_k,          focusstack,     {.i = -1} },
+ 	{ MODKEY,                    XKB_KEY_i,          incnmaster,     {.i = +1} },
+ 	{ MODKEY,                    XKB_KEY_d,          incnmaster,     {.i = -1} },
+diff --git a/dwl.c b/dwl.c
+index bf340d8..fc81d89 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -345,6 +345,7 @@ static void pointerfocus(Client *c, struct wlr_surface *surface,
+ 		double sx, double sy, uint32_t time);
+ static void powermgrsetmode(struct wl_listener *listener, void *data);
+ static void quit(const Arg *arg);
++static void reload_colors(const Arg *arg);
+ static void rendermon(struct wl_listener *listener, void *data);
+ static void requestdecorationmode(struct wl_listener *listener, void *data);
+ static void requeststartdrag(struct wl_listener *listener, void *data);
+@@ -2348,6 +2349,25 @@ quit(const Arg *arg)
+ 	wl_display_terminate(dpy);
+ }
+ 
++void
++reload_colors(const Arg *arg)
++{
++    FILE *f = fopen(colors_file, "r");
++    if (!f) return;
++
++    for (int i = 0; i < (int)LENGTH(colors); i++) {
++        unsigned int fg, bg, border;
++        if (fscanf(f, "%x %x %x", &fg, &bg, &border) != 3)
++            break;
++
++        colors[i][ColFg]    = fg;
++        colors[i][ColBg]    = bg;
++        colors[i][ColBorder] = border;
++    }
++	fclose(f);
++    drawbars();
++}
++
+ void
+ rendermon(struct wl_listener *listener, void *data)
+ {
+@@ -3482,6 +3502,7 @@ main(int argc, char *argv[])
+ 	if (!getenv("XDG_RUNTIME_DIR"))
+ 		die("XDG_RUNTIME_DIR must be set");
+ 	setup();
++	if (refresh_colors) reload_colors(0);
+ 	run(startup_cmd);
+ 	cleanup();
+ 	return EXIT_SUCCESS;
+-- 
+2.51.2
+

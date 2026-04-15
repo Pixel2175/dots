@@ -1,0 +1,203 @@
+From 38010bdecf63bdb8acfc584825b398838310eed1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Leonardo=20Hern=C3=A1ndez=20Hern=C3=A1ndez?=
+ <leohdz172@protonmail.com>
+Date: Tue, 16 Aug 2022 15:28:00 -0500
+Subject: [PATCH] don't draw borders if there is only one window
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Co-authored-by: A Frederick Christensen <dwl@ivories.org>
+Co-authored-by: Andrey Proskurin <andreyproskurin@protonmail.com>
+Signed-off-by: Leonardo Hernández Hernández <leohdz172@proton.me>
+---
+ config.def.h |  1 +
+ dwl.c        | 46 +++++++++++++++++++++++++++++++---------------
+ 2 files changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 22d2171d..632f151f 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -6,6 +6,7 @@
+ /* appearance */
+ static const int sloppyfocus               = 1;  /* focus follows mouse */
+ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
++static const int smartborders              = 1;
+ static const unsigned int borderpx         = 1;  /* border pixel of windows */
+ static const float rootcolor[]             = COLOR(0x222222ff);
+ static const float bordercolor[]           = COLOR(0x444444ff);
+diff --git a/dwl.c b/dwl.c
+index ad21e1ba..0c56431a 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -317,7 +317,7 @@ static void rendermon(struct wl_listener *listener, void *data);
+ static void requestdecorationmode(struct wl_listener *listener, void *data);
+ static void requeststartdrag(struct wl_listener *listener, void *data);
+ static void requestmonstate(struct wl_listener *listener, void *data);
+-static void resize(Client *c, struct wlr_box geo, int interact);
++static void resize(Client *c, struct wlr_box geo, int interact, int draw_borders);
+ static void run(char *startup_cmd);
+ static void setcursor(struct wl_listener *listener, void *data);
+ static void setcursorshape(struct wl_listener *listener, void *data);
+@@ -803,7 +803,7 @@ closemon(Monitor *m)
+ 	wl_list_for_each(c, &clients, link) {
+ 		if (c->isfloating && c->geom.x > m->m.width)
+ 			resize(c, (struct wlr_box){.x = c->geom.x - m->w.width, .y = c->geom.y,
+-					.width = c->geom.width, .height = c->geom.height}, 0);
++					.width = c->geom.width, .height = c->geom.height}, 0, 1);
+ 		if (c->mon == m)
+ 			setmon(c, selmon, c->tags);
+ 	}
+@@ -872,7 +872,11 @@ commitnotify(struct wl_listener *listener, void *data)
+ 		return;
+ 	}
+ 
+-	resize(c, c->geom, (c->isfloating && !c->isfullscreen));
++	if (client_surface(c)->mapped && c->mon && c->mon->lt[c->mon->sellt]->arrange
++			&& !c->isfullscreen && !c->isfloating)
++		c->mon->lt[c->mon->sellt]->arrange(c->mon);
++	else
++		resize(c, c->geom, (c->isfloating && !c->isfullscreen), (c->isfloating && !c->isfullscreen));
+ 
+ 	/* mark a pending resize as completed */
+ 	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial)
+@@ -1819,7 +1823,7 @@ monocle(Monitor *m)
+ 	wl_list_for_each(c, &clients, link) {
+ 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
+ 			continue;
+-		resize(c, m->w, 0);
++		resize(c, m->w, 0, !smartborders);
+ 		n++;
+ 	}
+ 	if (n)
+@@ -1911,11 +1915,11 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
+ 	if (cursor_mode == CurMove) {
+ 		/* Move the grabbed client to the new position. */
+ 		resize(grabc, (struct wlr_box){.x = (int)round(cursor->x) - grabcx, .y = (int)round(cursor->y) - grabcy,
+-			.width = grabc->geom.width, .height = grabc->geom.height}, 1);
++			.width = grabc->geom.width, .height = grabc->geom.height}, 1, 1);
+ 		return;
+ 	} else if (cursor_mode == CurResize) {
+ 		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
+-			.width = (int)round(cursor->x) - grabc->geom.x, .height = (int)round(cursor->y) - grabc->geom.y}, 1);
++			.width = (int)round(cursor->x) - grabc->geom.x, .height = (int)round(cursor->y) - grabc->geom.y}, 1, 1);
+ 		return;
+ 	}
+ 
+@@ -2194,7 +2198,7 @@ requestmonstate(struct wl_listener *listener, void *data)
+ }
+ 
+ void
+-resize(Client *c, struct wlr_box geo, int interact)
++resize(Client *c, struct wlr_box geo, int interact, int draw_borders)
+ {
+ 	struct wlr_box *bbox;
+ 	struct wlr_box clip;
+@@ -2206,6 +2210,7 @@ resize(Client *c, struct wlr_box geo, int interact)
+ 
+ 	client_set_bounds(c, geo.width, geo.height);
+ 	c->geom = geo;
++	c->bw = draw_borders ? borderpx : 0;
+ 	applybounds(c, bbox);
+ 
+ 	/* Update scene-graph, including borders */
+@@ -2330,6 +2335,8 @@ setfloating(Client *c, int floating)
+ 	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
+ 			(p && p->isfullscreen) ? LyrFS
+ 			: c->isfloating ? LyrFloat : LyrTile]);
++	if (c->isfloating && !c->bw)
++		resize(c, c->mon->m, 0, 1);
+ 	arrange(c->mon);
+ 	printstatus();
+ }
+@@ -2347,11 +2354,11 @@ setfullscreen(Client *c, int fullscreen)
+ 
+ 	if (fullscreen) {
+ 		c->prev = c->geom;
+-		resize(c, c->mon->m, 0);
++		resize(c, c->mon->m, 0, 0);
+ 	} else {
+ 		/* restore previous size instead of arrange for floating windows since
+ 		 * client positions are set by the user and cannot be recalculated */
+-		resize(c, c->prev, 0);
++		resize(c, c->prev, 0, 1);
+ 	}
+ 	arrange(c->mon);
+ 	printstatus();
+@@ -2367,6 +2374,12 @@ setlayout(const Arg *arg)
+ 	if (arg && arg->v)
+ 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
+ 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, LENGTH(selmon->ltsymbol));
++	if (!selmon->lt[selmon->sellt]->arrange) {
++		/* floating layout, draw borders around all clients */
++		Client *c;
++		wl_list_for_each(c, &clients, link)
++			resize(c, c->mon->m, 0, 1);
++	}
+ 	arrange(selmon);
+ 	printstatus();
+ }
+@@ -2401,7 +2414,7 @@ setmon(Client *c, Monitor *m, uint32_t newtags)
+ 		arrange(oldmon);
+ 	if (m) {
+ 		/* Make sure window actually overlaps with the monitor */
+-		resize(c, c->geom, 0);
++		resize(c, c->geom, 0, 1);
+ 		c->tags = newtags ? newtags : m->tagset[m->seltags]; /* assign tags of target monitor */
+ 		setfullscreen(c, c->isfullscreen); /* This will call arrange(c->mon) */
+ 		setfloating(c, c->isfloating);
+@@ -2701,7 +2714,7 @@ tagmon(const Arg *arg)
+ void
+ tile(Monitor *m)
+ {
+-	unsigned int mw, my, ty;
++	unsigned int mw, my, ty, draw_borders = 1;
+ 	int i, n = 0;
+ 	Client *c;
+ 
+@@ -2711,6 +2724,9 @@ tile(Monitor *m)
+ 	if (n == 0)
+ 		return;
+ 
++	if (n == smartborders)
++		draw_borders = 0;
++
+ 	if (n > m->nmaster)
+ 		mw = m->nmaster ? (int)roundf(m->w.width * m->mfact) : 0;
+ 	else
+@@ -2721,11 +2737,11 @@ tile(Monitor *m)
+ 			continue;
+ 		if (i < m->nmaster) {
+ 			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
+-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
++				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0, draw_borders);
+ 			my += c->geom.height;
+ 		} else {
+ 			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
+-				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
++				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0, draw_borders);
+ 			ty += c->geom.height;
+ 		}
+ 		i++;
+@@ -2894,7 +2910,7 @@ updatemons(struct wl_listener *listener, void *data)
+ 		arrange(m);
+ 		/* make sure fullscreen clients have the right size */
+ 		if ((c = focustop(m)) && c->isfullscreen)
+-			resize(c, m->m, 0);
++			resize(c, m->m, 0, 0);
+ 
+ 		/* Try to re-set the gamma LUT when updating monitors,
+ 		 * it's only really needed when enabling a disabled output, but meh. */
+@@ -3103,7 +3119,7 @@ configurex11(struct wl_listener *listener, void *data)
+ 	if ((c->isfloating && c != grabc) || !c->mon->lt[c->mon->sellt]->arrange) {
+ 		resize(c, (struct wlr_box){.x = event->x - c->bw,
+ 				.y = event->y - c->bw, .width = event->width + c->bw * 2,
+-				.height = event->height + c->bw * 2}, 0);
++				.height = event->height + c->bw * 2}, 0, 1);
+ 	} else {
+ 		arrange(c->mon);
+ 	}
+-- 
+2.48.0
+
