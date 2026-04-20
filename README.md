@@ -17,7 +17,8 @@ dynamic window manager for wayland (dwm for wayland).
 - swallow
 - tablet-input
 - warpcursor
-[repo](https://codebergo.org/dwl)
+
+[repo](https://codeberg.org/dwl)
 
 # Neovim
 options.lua, globals.lua, commands.lua, binds.lua, are just data files.
@@ -51,10 +52,12 @@ Another simple but powerful function that opens an FZY window for searching file
 # Sta
 A simple monitoring app inspired by slstatus.
 It adds a new feature: it can send an update signal instead of waiting for the delay countdown.
+
 [repo](https://codeberg.org/pi66/sta)
 
 # Colorscheme
 I created a custom system-wide colorscheme and apply it to the whole system using a tool called [Walrs](https://codeberg.org/pi66/walrs).
+
 It is used across the window manager, terminal, neovim, and even Krita to keep a consistent look.
 
 ## Palette
