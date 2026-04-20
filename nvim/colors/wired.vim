@@ -29,7 +29,7 @@ if (has('termguicolors') && &termguicolors) || has('gui_running')
     \ '#e76485',
     \ '#70a0a0',
     \ '#e7d0cd'
-    \ ']
+    \ ]
   for i in range(g:terminal_ansi_colors->len())
     let g:terminal_color_{i} = g:terminal_ansi_colors[i]
   endfor
