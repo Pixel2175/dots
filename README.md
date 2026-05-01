@@ -49,6 +49,10 @@ Another simple but powerful function that opens an FZY window for searching file
 - [vim-closetag](https://github.com/alvan/vim-closetag)
 - [vim-tpipeline](https://github.com/vimpostor/vim-tpipeline)
 
+# Tmux
+Minimal and flexible tiled and tabbed terminal pane manager configuration for Tmux.
+[raw](https://codeberg.org/pi66/dots/raw/branch/main/tmux.conf)
+
 # Sta
 A simple monitoring app inspired by slstatus.
 It adds a new feature: it can send an update signal instead of waiting for the delay countdown.
@@ -56,12 +60,11 @@ It adds a new feature: it can send an update signal instead of waiting for the d
 [repo](https://codeberg.org/pi66/sta)
 
 # Colorscheme
-I created a custom system-wide colorscheme and apply it to the whole system using a tool called [Walrs](https://codeberg.org/pi66/walrs).
-
+gruvbox-hard fork but slightly muted and fully black bg.
 It is used across the window manager, terminal, neovim, and even Krita to keep a consistent look.
-
-## Palette
-check `colorscheme` file 
+applied system-wide using [Walrs](https://github.com/pixel2175/walrs).
+> check `colorscheme` file for more details.
+[raw](https://codeberg.org/pi66/dots/raw/branch/main/colorscheme)
 
 # Preview
 
