@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <string.h>
-#include <signal.h>
 #include <errno.h>
 
 #define SOCKET_PATH "/tmp/sta.sock"
@@ -58,7 +57,7 @@ void add_pro(Pros *list, int id, char *name)
 	list->count++;
 	list->process = realloc(list->process, sizeof(Pro) * list->count);
 	if (!list->process) {
-		warn("Memory", "memory allocation failed.");
+		warn("Memory: memory allocation failed.");
 		exit(1);
 	}
 	list->process[list->count - 1].name = strdup(name);
@@ -108,13 +107,6 @@ void append(Args *command, Pros *list)
 	show_pros(list);
 }
 
-void clean_up(int s)
-{
-	(void)s;
-	unlink(SOCKET_PATH);
-	exit(0);
-}
-
 void *worker(void *arg)
 {
 	Potato *data = arg;
@@ -130,10 +122,6 @@ void *worker(void *arg)
 
 void run_server(struct sockaddr_un *addr, int sock, Pros *list)
 {
-	signal(SIGTERM, clean_up);
-	signal(SIGINT, clean_up);
-	unlink(SOCKET_PATH);
-
 	int cmds = sizeof(commands) / sizeof(commands[0]);
 	pthread_t tids[cmds];
 	for (int i = 0; i < cmds; ++i) {
@@ -148,10 +136,10 @@ void run_server(struct sockaddr_un *addr, int sock, Pros *list)
 	}
 
 	if (bind(sock, (struct sockaddr *)addr, sizeof(*addr)) < 0)
-		warn("Bind", "failed: %s", strerror(errno));
+		warn("Bind: failed: %s", strerror(errno));
 
 	if (listen(sock, 5) < 0)
-		warn("Listen", "failed: %s", strerror(errno));
+		warn("Listen failed: %s", strerror(errno));
 
 	while (1) {
 		int client = accept(sock, NULL, NULL);
@@ -215,7 +203,7 @@ void run_client(int argc, char const *argv[], struct sockaddr_un *addr, int sock
 	}
 
 	if (connect(sock, (struct sockaddr *)addr, sizeof(*addr)) < 0) {
-		warn("Connect", "failed: %s", strerror(errno));
+		warn("Connect: failed: %s", strerror(errno));
 		return;
 	}
 	write(sock, buf, strlen(buf));
@@ -229,18 +217,17 @@ int main(int argc, char const *argv[])
 
 	int sock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (sock < 0)
-		warn("Socket", "failed to create socket: %s", strerror(errno));
+		warn("Socket: failed to create socket: %s", strerror(errno));
 
 	Pros *list = init();
 
 	for (int i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--server")) {
+		  if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--server") == 0) {
 			if (access(SOCKET_PATH, F_OK) == 0){
 				if ( connect(sock, (struct sockaddr *)&addr, sizeof(addr) ) == 0 )
-					unlink(SOCKET_PATH);
-				else
-					die("ERROR: socket exists in " SOCKET_PATH);
-			}
+					die("Socket: socket exists and connectable.");		
+			}else 
+			  unlink(SOCKET_PATH);
 			run_server(&addr, sock, list);
 		}
 	}

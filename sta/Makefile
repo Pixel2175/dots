@@ -5,7 +5,7 @@ config.h:
 	cp config.def.h config.h
 
 install: build
-	cp sta /usr/local/bin
+	install -m 755 sta /usr/local/bin/sta
 
 uninstall:
 	rm -f /usr/local/bin/sta
