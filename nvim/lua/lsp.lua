@@ -8,7 +8,8 @@ for _, s in ipairs(servers) do
 	})
 end
 
-require('lspconfig').clangd.setup{
+lsp.clangd.setup{
+	capabilities = caps,
     cmd = { "clangd", "--enable-config" }
 }
 
