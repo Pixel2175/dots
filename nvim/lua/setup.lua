@@ -1,36 +1,10 @@
 require('neo-img').setup({})
 require('mini.pairs').setup({})
 require('Comment').setup()
-require('gitsigns').setup()
-require('colorizer').setup({ "*" }, {
-    RGB      = true,
-    RRGGBB   = true,
-    names    = true,
-    RRGGBBAA = true,
-    rgb_fn   = true,
-    hsl_fn   = true,
-    css      = true,
-    css_fn   = true,
-    mode     = 'background',
-})
-
-require("toggleterm").setup({
-    size             = 6,
-    open_mapping     = [[<C-_>]],
-    hide_numbers     = true,
-    shade_filetypes  = {},
-    shade_terminals  = false,
-    shading_factor   = 2,
-    start_in_insert  = true,
-    insert_mappings  = true,
-    terminal_mappings = true,
-    persist_size     = true,
-    persist_mode     = true,
-    direction        = "float",
-    close_on_exit    = true,
-    shell            = vim.o.shell,
-    auto_scroll      = true,
-})
+require('colorizer').setup({ "*" }, vim.g.colorizer )
+require("toggleterm").setup(vim.g.toggleterm)
+require("nvim-treesitter").install(vim.g.treesitter)
+require('gitsigns').setup({ preview_config = { border = 'rounded' } })
 
 local cmp = require("cmp")
 
