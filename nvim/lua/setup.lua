@@ -6,6 +6,7 @@ require("toggleterm").setup(vim.g.toggleterm)
 require("nvim-treesitter").install(vim.g.treesitter)
 require('gitsigns').setup({ preview_config = { border = 'rounded' } })
 
+_G.gs = require('gitsigns')
 local cmp = require("cmp")
 
 cmp.setup({
