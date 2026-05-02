@@ -38,12 +38,10 @@ cmp.setup({
         { name = "buffer"   },
         { name = "path"     },
     },
+	snippet = {
+		expand = function(args)
+			vim.snippet.expand(args.body)
+		end,
+	},
 })
 
-require("nvim-treesitter").install({
-    "rust",
-    "c",
-    "javascript",
-    "zig",
-    "python",
-})
