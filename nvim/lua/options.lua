@@ -20,7 +20,7 @@ return {
 	wildmenu           = true,
 	undofile           = true,
 	undodir            = vim.fn.expand("~/.local/state/nvim/undo"),
-	cursorline         = true,
+	cursorline         = false,
 	wildmode           = "longest:full,full",
 	wildignore         = "*.docx,*.we*,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.svg,*.flv,*.img,*.xlsx",
 	clipboard          = "unnamedplus",
