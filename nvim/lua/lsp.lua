@@ -1,4 +1,4 @@
-local servers = { "ada_ls","ts_ls", "pyright", "tailwindcss", "zls", "html", "cssls", "rust_analyzer", "lua_ls","texlab" }
+local servers =  vim.g.lsp_servers
 local caps = require('cmp_nvim_lsp').default_capabilities()
 local lsp = require('lspconfig')
 
