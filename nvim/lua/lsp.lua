@@ -13,22 +13,6 @@ lsp.clangd.setup{
     cmd = { "clangd", "--enable-config" }
 }
 
-lsp.nim_langserver.setup({
-    capabilities = caps,
-    on_init = function(client, _)
-        client.handlers["window/showMessage"] = function() end
-        client.handlers["window/logMessage"]  = function() end
-    end,
-})
-
-lsp.ada_ls.setup({
-	cmd = { "ada_language_server" }
-})
-
-lsp.lua_ls.setup({
-	capabilities = caps,
-})
-
 vim.diagnostic.config({
     virtual_text = false,
     signs = false,
