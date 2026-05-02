@@ -1,5 +1,3 @@
-local border = { "╭","─","╮","│","╯","─","╰","│" }
-
 require('neo-img').setup({})
 require('Comment').setup()
 require('gitsigns').setup()
