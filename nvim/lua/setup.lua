@@ -1,4 +1,5 @@
 require('neo-img').setup({})
+require('mini.pairs').setup({})
 require('Comment').setup()
 require('gitsigns').setup()
 require('colorizer').setup({ "*" }, {
