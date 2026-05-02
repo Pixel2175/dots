@@ -12,11 +12,11 @@ local cmp = require("cmp")
 cmp.setup({
     window = {
         completion = cmp.config.window.bordered({
-            border      = border,
+			border       = { "╭","─","╮","│","╯","─","╰","│" },
             winhighlight = "Normal:NormalFloat,FloatBorder:White,CursorLine:PmenuSel,Search:None",
         }),
         documentation = cmp.config.window.bordered({
-            border      = border,
+			border       = { "╭","─","╮","│","╯","─","╰","│" },
             winhighlight = "Normal:NormalFloat,FloatBorder:White,CursorLine:PmenuSel,Search:None",
         }),
     },
