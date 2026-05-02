@@ -1,6 +1,17 @@
 return {
 	--  mode              key          cmd                            --
 	--------------------------------------------------------------------
+	{   "n",              "ff",        function() fzy_finder(true) end },
+	{   "n",			  "fd",        ":%s//g<Left><Left>"            },
+	{   "v",			  "fd",        ":s//g<Left><Left>"             },
+	{   "t",              "<Esc>",     [[<C-\><C-n>]]                  },
+	{   "n",              "<C-f>",     ":nohlsearch<CR>"               },
+	{   "n",              "<C-k>",     ":m .-2<CR>=="                  },
+	{   "n",              "<C-j>",     ":m .+1<CR>=="                  },
+	{   "v",              "<C-k>",     ":silent m '<-2<CR>gv=gv"       },
+	{   "v",              "<C-j>",     ":silent m '>+1<CR>gv=gv"       },
+	{   "n",              "<C-o>",     ":tabedit <cfile><CR>"          },
+	{ { "n", "v" },       "<C-e>",     ":so $MYVIMRC <CR>"             },
 	{ { "n", "v" },       "<C-a>",     "ggVG"                          },
 	{   "n",              "<leader>n", gs.next_hunk                    },
 	{   "n",              "<leader>p", gs.prev_hunk                    },
@@ -11,6 +22,7 @@ return {
 	{   "n",              "<leader>i", gs.toggle_current_line_blame    },
 	{   "n",              "<leader>i", ":!git commit -m "              },
 	{ { "n", "v" },		  "<S-l>",     ":tabnext<CR>"                  },
+	{ { "n", "v" },       "<S-h>",     ":tabprev<CR>"                  },
 	{ { "n", "v" },       "<",         "<gv"                           },
 	{ { "n", "v" },       ">",         ">gv"                           },
 	{ { "n", "v" },       "<S-h>",     ":tabprev<CR>"                  },
@@ -23,5 +35,5 @@ return {
 	{   "n",              "gd",        ":tab split | lua vim.lsp.buf.definition()<CR>" },
 	{   "n",              "<leader>g", function() gdb() end           },
 	{   "n",              "<A-/>",     require("Comment.api").toggle.linewise.current },
-	{   "v",              "<A-/>",     function() vim.api.nvim_feedkeys("gc", "x", false ) end },
+	{   "n",              "gd",        ":tab split | lua vim.lsp.buf.definition()<CR>" },
 }
